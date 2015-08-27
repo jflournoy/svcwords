@@ -138,6 +138,26 @@ cleanDat_w%>%
 	rename(Cont_v_Acc=SelfPop_1) %>% 
 	kable(caption='Controversial versus Accepted Status Frequencies')
 
+#'
+#' We want to keep all the prosocial items we can, so let's see what correlates with it and just remove
+#' those items from the factor analysis. Then we can see what else sticks together, and use that 
+#' as the second one.
+#'
+
+tbb.ps <- dplyr::select(cleanDat_w, matches('(lazy|helpful|honest|smart)_Self')) %>%
+	mutate_each(funs(as.numeric))
+corwith.tbb.ps <- dplyr::select(
+				cleanDat_w, 
+				matches('_Self'), 
+				-matches('(lazy|helpful|honest|smart)_Self')) %>%
+	mutate_each(funs(as.numeric))
+
+cors.allwtbb <- cor(tbb.ps, corwith.tbb.ps, use='pairwise.complete.obs')
+avgcor <- apply(cors.allwtbb, 2, function(x){mean(c(x[1], x[2], -x[3], x[4]))})
+
+
+
+
 #' # Self Ratings
 #'
 #' ## Best predictors of status

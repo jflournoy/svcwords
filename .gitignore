@@ -14,3 +14,5 @@ vignettes/*.pdf
 
 *_files/
 *_cache/
+
+*.swp
