@@ -1,3 +1,11 @@
+#' 1. EFA using scree plot with correct interpretation
+#' 2. Examine loadings, drop items that don't load on any factor
+#' 3. goto step 1
+#' 4. Examine items with high cross loadings (>.3) and think think think
+#' 5. If factor loadings look good and dimensions make sense:
+#' 6. assess reliability of scales
+#' 7. retool as neccessary starting at 1.
+#' 8. check predictive validity (status, depression)
 #'
 #' This is an EFA for the ratings of the self on all items. Only 70 of the 77 have totally complete data, and to be conservative, I'm just looking at those 70. We don't lose too much without those 7 and it's easier to satisfy assumptions of EFA without missing data. Haven't looked closely at what they're missing yet though.
 #'
@@ -154,6 +162,12 @@ corwith.tbb.ps <- dplyr::select(
 
 cors.allwtbb <- cor(tbb.ps, corwith.tbb.ps, use='pairwise.complete.obs')
 avgcor <- apply(cors.allwtbb, 2, function(x){mean(c(x[1], x[2], -x[3], x[4]))})
+avgcor[order(abs(avgcor))]
+
+psitems<-c(
+	   'lazy',
+	   'helpful',
+	   'honest')
 
 
 
@@ -306,6 +320,14 @@ printableSortedSelfFA<-cbind(item=sortedSelfFA[,1],
 print(selfRateFA,sort=T)
 
 #'
+#' We can look at how these factors group together too...
+#'
+
+scree(selfRateFA$Phi)
+print(fa(selfRateFA$Phi, nfactors=2, fm='pa', rotate='oblimin'))
+
+
+#'
 #' The four factors are pretty interpretable, if you ask me. 
 #'
 #' 1. First (PA3), is surgency/dynamism/extraversion (reverse coded 'cause EFA): not depressed, lonely, or insecure; trendy, confident, popular, social.
@@ -396,6 +418,7 @@ selfRateFA<-fa(
 	use='pairwise.complete.obs')
 print(selfRateFA,sort=T)
 
+
 #'
 #' These clusters of items may still be related to status (and they're
 #' actually pretty close to the expected factors, just divided up a bit
@@ -423,7 +446,7 @@ selfPopDat<-cleanDat_w[,c('SelfPop_1','SelfPop_2')]%>%mutate_each(funs(as.numeri
 #' component (remember, reverse the sign here because of the depression 
 #' item anchoring the scale).
 #'
-selfRateDat_nopop<-select(selfRateDat,-matches('SelfPop'))
+selfRateDat_nopop<-select(selfRateDat_lim,-matches('SelfPop'))
 
 #mean imputation just to get a score for everyone...
 #not perfect, but it'll do
@@ -434,6 +457,7 @@ selfRateDat_nopop_imputed<-apply(
 	function(x){
 		ifelse(is.na(x),mean(x,na.rm=T),x)
 	})
+
 
 corr.test(
 	as.data.frame(selfPopDat),
