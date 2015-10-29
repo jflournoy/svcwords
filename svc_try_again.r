@@ -790,3 +790,70 @@ alpha(dataCFA[,itemScaleGroupsCFA$item[itemScaleGroupsCFA$maxPA=='PA3']],check.k
 #' Check how these factors relate to people's intuitions about what defines the two
 #' status types.
 #'
+
+#'
+#' # EFA on items picked by Jenn
+#'
+
+freshItems <- c('considerate_Self',
+'nice_Self',
+'helpful_Self',
+'genuine_Self',
+'caring_Self',
+'friendly_Self',
+'trustworthy_Self',
+'loyal_Self',
+'giving_Self',
+'sympathetic_Self',
+'welcoming_Self',
+'fair_Self',
+'respectful_Self',
+'calm_Self',
+'honest_Self',
+'humble_Self',
+'motivated_Self',
+'insecure_Self',
+'lonely_Self',
+'depressed_Self',
+'awkward_Self',
+'loner_Self',
+'plain_Self',
+'shy_Self',
+'`boring _Self`',
+'confident_Self',
+'pushover_Self',
+'ugly_Self',
+'trendy_Self',
+'social_Self',
+'popular_Self',
+'flirty_Self',
+'outgoing_Self',
+'controlling_Self',
+'bossy_Self',
+'angry_Self',
+'mean_Self',
+'grumpy_Self',
+'agressive_Self',
+'snobby_Self',
+'rude_Self',
+'selfish_Self',
+'jealous_Self',
+'stubborn_Self',
+'risky_Self',
+'fake_Self',
+'attractive_Self',
+'cool_Self')
+
+freshSelfRate <- select_(selfRateDat,.dots=freshItems)
+scree(freshSelfRate)
+
+selfRateFA<-fa(
+	freshSelfRate,
+	nfactors=3,
+	rotate='oblimin',
+	scores='tenBerge',
+	fm='pa',
+	use='pairwise.complete.obs')
+print(selfRateFA,sort=T, 
+      #cut=.29,
+      short=T)
