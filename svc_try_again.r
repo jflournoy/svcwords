@@ -167,6 +167,22 @@ selfRateDat<-select(cleanDat_w,matches('_Self'),matches('SelfPop')) %>%
 
 selfRateDatCor<-cor(select(selfRateDat,-matches('SelfPop')),use='pairwise.complete.obs')
 
+colnames(selfRateDatCor) <- sub(' _',  '_', colnames(selfRateDatCor))
+rownames(selfRateDatCor) <- sub(' _',  '_', rownames(selfRateDatCor))
+longCor <- selfRateDatCor %>% as.data.frame %>%
+	mutate(rows=rownames(selfRateDatCor)) %>%
+	gather(cols, value, -rows)
+scale.max.r =  max(abs(longCor$value))
+
+longCor %>% ggplot(aes(x=cols, y=rows, fill=value)) +
+	geom_bin2d()+
+	scale_fill_gradientn(limits=c(-1, 1),
+			     colours = c('blue', 'blue', 
+					 'aliceblue', 'white', 
+					 'mistyrose', 'red', 'red'), 
+			     values = scales::rescale(c(-1, -scale.max.r,-.1, 0, .1,scale.max.r, 1)),
+			     breaks=c(-.3, .3))
+
 scree(selfRateDatCor)
 
 selfRateFA<-fa(
