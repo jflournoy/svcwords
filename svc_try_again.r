@@ -835,7 +835,7 @@ freshItems <- c('considerate_Self',
 'loner_Self',
 'plain_Self',
 'shy_Self',
-'`boring _Self`',
+'boring_Self',
 'confident_Self',
 'pushover_Self',
 'ugly_Self',
@@ -860,6 +860,7 @@ freshItems <- c('considerate_Self',
 'attractive_Self',
 'cool_Self')
 
+names(selfRateDat) <- sub(' _',  '_', names(selfRateDat))
 freshSelfRate <- select_(selfRateDat,.dots=freshItems)
 scree(freshSelfRate)
 
@@ -871,5 +872,27 @@ selfRateFA<-fa(
 	fm='pa',
 	use='pairwise.complete.obs')
 print(selfRateFA,sort=T, 
-      #cut=.29,
+      cut=.29,
       short=T)
+
+itemScaleGroups<-as.data.frame(selfRateFA$loadings[,]) %>%
+	mutate(item=rownames(.)) %>%
+	group_by(item) %>%
+	do({
+		sorted<-.[,c('PA1','PA2','PA3')][order(abs(.[,c('PA1','PA2','PA3')]))]
+		data.frame(
+			max=sorted[[3]],
+			maxPA=names(sorted)[3])
+	})
+
+cat(selfReportCFAmodel<-paste(
+	tapply(itemScaleGroups$item,itemScaleGroups$maxPA,function(x){
+		paste0(sub('_Self','',x[1]),'=~',
+			paste0(x,collapse='+'))
+	}) %>% paste0(collapse='\n'),'\n'))
+
+semPaths(selfReportCFAmodel)
+srCFA<-cfa(selfReportCFAmodel,data=freshSelfRate)
+summary(srCFA)
+semPaths(srCFA, what='std', whatLabels='std')
+
