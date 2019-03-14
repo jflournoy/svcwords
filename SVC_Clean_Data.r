@@ -13,19 +13,20 @@ library(elasticnet)
 library(glmnet)
 library(doMC)
 
+mturk_data_dir <- 'mturk_data'
 
-svc.imp<-read.csv('SVC_Norming.csv',stringsAsFactors=F)
+svc.imp<-read.csv(file.path(mturk_data_dir, 'SVC_Norming.csv'),stringsAsFactors=F)
 mturk.imp<-rbind(
-	read.csv('Batch_2047596_batch_results.csv',stringsAsFactors=F),
-	read.csv('Batch_2044018_batch_results.csv',stringsAsFactors=F),
-	read.csv('Batch_2041668_batch_results.csv',stringsAsFactors=F))
+	read.csv(file.path(mturk_data_dir, 'Batch_2047596_batch_results.csv'),stringsAsFactors=F),
+	read.csv(file.path(mturk_data_dir, 'Batch_2044018_batch_results.csv'),stringsAsFactors=F),
+	read.csv(file.path(mturk_data_dir, 'Batch_2041668_batch_results.csv'),stringsAsFactors=F))
 
 # head(svc.imp)
 dim(svc.imp)
 
 # head(mturk.imp)
 dim(mturk.imp)
-# edit(mturk.imp)
+# View(mturk.imp)
 
 kable(mturk.imp %>% filter(WorkerId %in% WorkerId[duplicated(WorkerId)]))
 
@@ -135,7 +136,7 @@ check_latlon<-left_join(
 	mutate(index=1:n())
 
 check_latlon%>%
-	select_(.dots=c('WorkerId','LocationLatitude','LocationLongitude','index')) %>%
+	select(one_of('WorkerId','LocationLatitude','LocationLongitude','index')) %>%
 	arrange(WorkerId) %>% kable
 
 #+cache=T,echo=F,warning=F,message=F,error=F,results='hide'
@@ -192,8 +193,8 @@ dim(cleanDat)
 #'
 
 #+results='markup'
-svc.imp.23<-read.csv('SVC_Norming_23.csv',stringsAsFactors=F)
-mturk.imp.23<-read.csv('Batch_2052027_batch_results.csv',stringsAsFactors=F)
+svc.imp.23<-read.csv(file.path(mturk_data_dir, 'SVC_Norming_23.csv'),stringsAsFactors=F)
+mturk.imp.23<-read.csv(file.path(mturk_data_dir, 'Batch_2052027_batch_results.csv'),stringsAsFactors=F)
 
 dim(svc.imp.23)
 dim(mturk.imp.23)

@@ -16,3 +16,4 @@ vignettes/*.pdf
 *_cache/
 
 *.swp
+.Rproj.user
