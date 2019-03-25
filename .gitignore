@@ -20,3 +20,6 @@ vignettes/*.pdf
 
 mturk_data
 mturk_data/*
+
+GeneralSurvey
+GeneralSurvey/*
