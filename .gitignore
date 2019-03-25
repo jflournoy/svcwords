@@ -17,3 +17,5 @@ vignettes/*.pdf
 
 *.swp
 .Rproj.user
+
+mturk_data/*
