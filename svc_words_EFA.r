@@ -905,14 +905,54 @@ srCFA<-cfa(selfReportCFAmodel,data=freshSelfRate)
 summary(srCFA)
 semPaths(srCFA, what='std', whatLabels='std')
 
-items_used <- read.csv('svcTraits.csv', header = F)
-items_used$used_items <- TRUE
-items_used <- items_used[,c(1,5)]
-names(items_used) <- c('items', 'used_items') 
+itemScaleGroups<-as.data.frame(selfRateFA$loadings[,]) %>%
+  mutate(item=rownames(.)) %>%
+  group_by(item) %>%
+  do({
+    sorted<-.[,c('PA1','PA3','PA2')][order(as.data.frame(abs(.[,c('PA1','PA3','PA2')])))]
+    data.frame(
+      max=sorted[[3]],
+      maxPA=names(sorted)[3])
+  })
+
+Rscore<-function(x,min,max){
+  r<-max-x+min
+}
+
+selfRateFAScaleScores<-cleanDat_w %>% 
+  rename(`boring_Self` = `boring _Self`) %>%
+  select(WorkerId,one_of(itemScaleGroups$item)) %>% 
+  gather(item,resp,-WorkerId) %>%
+  left_join(itemScaleGroups) %>%
+  mutate(resp=as.numeric(resp)) %>%
+  mutate(R_resp=ifelse(
+    sign(max)<0,
+    Rscore(resp,1,6),
+    resp)) %>%
+  group_by(WorkerId,maxPA) %>%
+  summarise(
+    item_ex=sub('_Self','',item[[1]]),
+    scale_score=mean(R_resp>3,na.rm=T)) %>%
+  select(WorkerId,item_ex,scale_score) %>%
+  spread(item_ex,scale_score) %>%
+  left_join(select(cleanDat_w,WorkerId,matches('SelfPop'),matches('YSUBS'))) %>%
+  mutate_at(.funs=funs(as.numeric),.vars = vars(-WorkerId)) %>%
+  ungroup()
+
+itemScaleGroups_fresh <- itemScaleGroups
+
+#+fig.width=10, fig.height=10
+ggpairs(selfRateFAScaleScores %>% select(agressive, attractive, calm, SelfPop_1, SelfPop_2),
+        lower=list(continuous='smooth'), diag=list(continuous='bar'))
 
 #'
 #' ## Items we used in SvC TAG
 #'
+
+items_used <- read.csv('svcTraits.csv', header = F)
+items_used$used_items <- TRUE
+items_used <- items_used[,c(1,5)]
+names(items_used) <- c('items', 'used_items') 
 
 item_comp <- full_join(
   mutate(items_used,
